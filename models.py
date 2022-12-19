@@ -21,13 +21,6 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-# database_path = app.config['SQLALCHEMY_DATABASE_URI']
-
-
-# def setup_db(app, database_path):
-#     db.app = app
-#     db.init_app(app)
-#     db.create_all()
 
 #----------------------------------------------------------------------------#
 # Models.

@@ -47,6 +47,8 @@ def format_datetime(value, format='medium'):
 app.jinja_env.filters['datetime'] = format_datetime
 
 
+# datetime formatting article: https://www.programiz.com/python-programming/datetime/strftime
+
 def format_date_string(value):
     format = "%b %d %Y %r"
     start_time = value.strftime(format)
@@ -196,8 +198,6 @@ def delete_venue(venue_id):
     else:
         return jsonify({'success': True})
 
-    # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-    # clicking that button delete it from the db then redirect the user to the homepage
     return None
 
 #  Artists
