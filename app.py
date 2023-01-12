@@ -6,7 +6,17 @@ import json
 import dateutil.parser
 import datetime
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify, abort
+from flask import (
+    Flask,
+    render_template,
+    request,
+    Response,
+    flash,
+    redirect,
+    url_for,
+    jsonify,
+    abort
+)
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -16,7 +26,7 @@ from flask_wtf import Form
 from forms import *
 import sys
 import models
-from models import Show, Artist, Venue
+from models import db, Show, Artist, Venue
 
 
 #----------------------------------------------------------------------------#
@@ -96,20 +106,11 @@ def venues():
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
     search_term = request.form.get('search_term', '')
-    venues_query = Venue.query.all()
-    data = []
-
-    for venue in venues_query:
-        name = venue.name.lower()
-        search = search_term.lower()
-        if search in name:
-            data.append({"id": venue.id, "name": venue.name})
-
-    count = len(data)
-
+    matching = Venue.query.filter(Venue.name.ilike('%'+search_term+'%')).all()
+    count = len(matching)
     response = {
         "count": count,
-        "data": data
+        "data": matching
     }
     return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
@@ -213,20 +214,12 @@ def artists():
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
     search_term = request.form.get('search_term', '')
-    artists_query = Artist.query.all()
-    data = []
-
-    for artist in artists_query:
-        name = artist.name.lower()
-        search = search_term.lower()
-        if search in name:
-            data.append({"id": artist.id, "name": artist.name})
-
-    count = len(data)
-
+    matching = Artist.query.filter(
+        Artist.name.ilike('%'+search_term+'%')).all()
+    count = len(matching)
     response = {
         "count": count,
-        "data": data
+        "data": matching
     }
     return render_template('pages/search_artists.html', results=response, search_term=search_term)
 
@@ -450,6 +443,16 @@ def create_show_submission():
         abort(500)
     else:
         flash('Show was successfully listed!')
+
+
+@app.errorhandler(400)
+def not_found_error(error):
+    return render_template('errors/400.html'), 400
+
+
+@app.errorhandler(401)
+def not_found_error(error):
+    return render_template('errors/401.html'), 401
 
 
 @app.errorhandler(404)

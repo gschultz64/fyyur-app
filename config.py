@@ -1,12 +1,10 @@
 import os
-SECRET_KEY = os.urandom(32)
-# Grabs the folder where the script runs.
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# Enable debug mode.
 DEBUG = True
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# Connect to the database
-SQLALCHEMY_DATABASE_URI = 'postgresql://student:student@localhost:5432/fyyur'
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
