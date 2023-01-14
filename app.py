@@ -2,7 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-import json
+import os
 import dateutil.parser
 import datetime
 import babel
@@ -33,11 +33,20 @@ from models import db, Show, Artist, Venue
 # App Config.
 #----------------------------------------------------------------------------#
 
-app = Flask(__name__)
+migrate = Migrate()
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(os.getenv("APP_SETTINGS", "config.Config"))
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    return app
+
+
+app = create_app()
 moment = Moment(app)
-app.config.from_object('config')
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
 
 
 #----------------------------------------------------------------------------#
@@ -287,7 +296,7 @@ def edit_artist_submission(artist_id):
             flash('An error occurred. Artist ' +
                   name + ' could not be updated.')
             return redirect(url_for('show_artist', artist_id=artist_id))
-    except ():
+    except:
         db.session.rollback()
         error = True
         print(sys.exc_info())

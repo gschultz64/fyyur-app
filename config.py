@@ -1,10 +1,13 @@
-import os
-SECRET_KEY = os.environ.get('SECRET_KEY')
+from os import environ, path
+from dotenv import load_dotenv
 
-basedir = os.path.abspath(os.path.dirname(__file__))
 
-DEBUG = True
+basedir = path.abspath(path.dirname(__file__))
+load_dotenv(path.join(basedir, '.env'))
 
-SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
+class Config:
+    SECRET_KEY = environ.get('SECRET_KEY')
+    DEBUG = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = environ.get('DATABASE_URI')
