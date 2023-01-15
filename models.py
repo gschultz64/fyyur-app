@@ -16,9 +16,9 @@ class Show(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     venue_id = db.Column(db.Integer, db.ForeignKey(
-        'venues.id'), nullable=False, primary_key=True)
+        'venues.id'), nullable=False)
     artist_id = db.Column(db.Integer, db.ForeignKey(
-        'artists.id'), nullable=False, primary_key=True)
+        'artists.id'), nullable=False)
     start_time = db.Column(db.DateTime)
 
     def __init__(self, venue_id, artist_id, start_time):

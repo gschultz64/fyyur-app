@@ -54,7 +54,7 @@ def upgrade():
     sa.Column('start_time', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['artist_id'], ['artists.id'], ),
     sa.ForeignKeyConstraint(['venue_id'], ['venues.id'], ),
-    sa.PrimaryKeyConstraint('id', 'venue_id', 'artist_id')
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
