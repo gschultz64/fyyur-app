@@ -13,7 +13,6 @@ from flask import (
     flash,
     redirect,
     url_for,
-    jsonify,
     abort
 )
 from flask_moment import Moment
@@ -71,16 +70,6 @@ def format_date_string(value):
     format = "%b %d %Y %r"
     start_time = value.strftime(format)
     return start_time
-
-# past shows and upcoming shows TODO
-
-
-def list_shows(Show=Show, Venue=Venue):
-    past_shows_query = db.session.query(Show).join(Venue).filter(
-        Show.artist_id == artist_id).filter(Show.start_time < datetime.now()).all()
-    upcoming_shows_query = db.session.query(Show).join(Venue).filter(
-        Show.artist_id == artist_id).filter(Show.start_time > datetime.now()).all()
-    return past_shows_query, upcoming_shows_query
 
 
 @app.route('/')
@@ -174,22 +163,25 @@ def create_venue_form():
 def create_venue_submission():
     error = False
     form = VenueForm()
+    name = form.name.data
     try:
-        name = form.name.data
-        venue = Venue(
-            name=name, genres=form.genres.data, address=form.address.data, city=form.city.data,
-            state=form.state.data, phone=form.phone.data, website=form.website_link.data,
-            facebook_link=form.facebook_link.data, seeking_talent=form.seeking_talent.data,
-            seeking_description=form.seeking_description.data, image_link=form.image_link.data
-        )
-        db.session.add(venue)
-        db.session.commit()
-        if form.is_submitted():
-            flash('Your venue ' + name + ' was successfully listed!')
-            return redirect('/venues')
+        if name is not None:
+            venue = Venue(
+                name=name, genres=form.genres.data, address=form.address.data, city=form.city.data,
+                state=form.state.data, phone=form.phone.data, website=form.website_link.data,
+                facebook_link=form.facebook_link.data, seeking_talent=form.seeking_talent.data,
+                seeking_description=form.seeking_description.data, image_link=form.image_link.data
+            )
+            db.session.add(venue)
+            db.session.commit()
+            if form.is_submitted():
+                flash('Your venue ' + name + ' was successfully listed!')
+                return redirect('/venues')
+            else:
+                flash('An error occurred. Venue ' + name + ' could not be listed.')
+                return render_template('pages/home.html')
         else:
-            flash('An error occurred. Venue ' + name + ' could not be listed.')
-            return render_template('pages/home.html')
+            flash('An error occurred. Form data is missing from the request.')
     except:
         db.session.rollback()
         error = True
@@ -392,23 +384,26 @@ def create_artist_form():
 def create_artist_submission():
     error = False
     form = ArtistForm()
+    name = form.name.data
     try:
-        name = form.name.data
-        artist = Artist(
-            name=name, genres=form.genres.data, city=form.city.data,
-            state=form.state.data, phone=form.phone.data, website=form.website_link.data,
-            facebook_link=form.facebook_link.data, seeking_venue=form.seeking_venue.data,
-            seeking_description=form.seeking_description.data, image_link=form.image_link.data
-        )
-        db.session.add(artist)
-        db.session.commit()
-        if form.is_submitted():
-            flash('Your artist ' + name + ' was successfully listed!')
-            return redirect('/artists')
+        if name is not None:
+            artist = Artist(
+                name=name, genres=form.genres.data, city=form.city.data,
+                state=form.state.data, phone=form.phone.data, website=form.website_link.data,
+                facebook_link=form.facebook_link.data, seeking_venue=form.seeking_venue.data,
+                seeking_description=form.seeking_description.data, image_link=form.image_link.data
+            )
+            db.session.add(artist)
+            db.session.commit()
+            if form.is_submitted():
+                flash('Your artist ' + name + ' was successfully listed!')
+                return redirect('/artists')
+            else:
+                flash('An error occurred. Artist ' +
+                    name + ' could not be listed.')
+                return render_template('pages/home.html')
         else:
-            flash('An error occurred. Artist ' +
-                  name + ' could not be listed.')
-            return render_template('pages/home.html')
+            flash('An error occurred. Form data is missing from the request.')
     except:
         db.session.rollback()
         error = True
@@ -457,16 +452,20 @@ def create_show_submission():
     error = False
     form = ShowForm()
     try:
-        show = Show(venue_id=form.venue_id.data,
-                    artist_id=form.artist_id.data, start_time=form.start_time.data)
-        db.session.add(show)
-        db.session.commit()
-        if form.is_submitted():
-            flash('Your show was successfully listed!')
-            return redirect('/shows')
+        if (form.venue_id.data is None) or (form.artist_id.data is None):
+            error = True
+            flash('An error occurred. Form data is missing from the request.')
         else:
-            flash('An error occurred. Show could not be listed.')
-            return render_template('pages/home.html')
+            show = Show(venue_id=form.venue_id.data,
+                        artist_id=form.artist_id.data, start_time=form.start_time.data)
+            db.session.add(show)
+            db.session.commit()
+            if form.is_submitted():
+                flash('Your show was successfully listed!')
+                return redirect('/shows')
+            else:
+                flash('An error occurred. Show could not be listed.')
+                return render_template('pages/home.html')
     except:
         db.session.rollback()
         error = True
